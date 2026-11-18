@@ -32,3 +32,8 @@ jobs:
           SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           curl -sS -X POST "https://$REF.supabase.co/functions/v1/cron" -H "x-cron-secret: $SECRET" -H 'Content-Type: application/json' -d '{}' -w '\nHTTP %{http_code}\n'
+      - name: Состояние вебхука Telegram
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          curl -sS "https://api.telegram.org/bot$TOKEN/getWebhookInfo" | jq '.result | {url, pending_update_count, last_error_date, last_error_message}'

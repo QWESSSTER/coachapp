@@ -140,12 +140,13 @@ function renderCtx(ctx) {
   else if (ctx.error && !ctx.data) {
     body = html`<div class="content top"><div class="empty">${ctx.error}</div><button class="btn primary big" data-act="__retry">Повторить</button></div>`;
   } else body = s.view(ctx);
-  const footer = ctx.data && s.footer ? String(s.footer(ctx) ?? '') : '';
+  const ready = !!ctx.data || (!ctx.loading && !ctx.error);
+  const footer = ready && s.footer ? String(s.footer(ctx) ?? '') : '';
   const cls = ['screen', s.tab ? 'has-tabs' : '', footer ? 'has-footer' : ''].join(' ');
-  const title = typeof s.title === 'function' ? (ctx.data ? s.title(ctx) : '') : s.title;
-  const nav = s.back ? navbar(title, s.backLabel, ctx.data ? s.navRight?.(ctx) : '') : '';
+  const title = typeof s.title === 'function' ? (ready ? s.title(ctx) : '') : s.title;
+  const nav = s.back ? navbar(title, s.backLabel, ready ? s.navRight?.(ctx) : '') : '';
   app().innerHTML = `<div class="${cls}">${nav}${body}${footer ? `<div class="footer">${footer}</div>` : ''}${s.tab ? tabbar(s.tab) : ''}</div>`;
-  if (s.mounted && ctx.data) s.mounted(ctx, app());
+  if (s.mounted && ready) s.mounted(ctx, app());
 }
 
 function navbar(title, backLabel = 'Назад', right = '') {

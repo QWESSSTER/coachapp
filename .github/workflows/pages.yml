@@ -1,0 +1,26 @@
+# Публикует мини-приложение (папка webapp) на GitHub Pages при каждом пуше в main.
+name: Mini app → GitHub Pages
+on:
+  push:
+    branches: [main]
+    paths: ['webapp/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: '${{ steps.d.outputs.page_url }}' }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Адрес API из переменной SUPABASE_PROJECT_REF
+        if: ${{ vars.SUPABASE_PROJECT_REF != '' }}
+        run: echo "export const API_URL = 'https://${{ vars.SUPABASE_PROJECT_REF }}.supabase.co/functions/v1/api';" > webapp/config.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: webapp }
+      - id: d
+        uses: actions/deploy-pages@v4

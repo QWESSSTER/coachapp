@@ -1,0 +1,8 @@
+{
+  "name": "coachapp",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-strip-types --no-warnings --test tests/logic.test.ts tests/telegram.test.ts && node --test tests/render.test.mjs"
+  }
+}

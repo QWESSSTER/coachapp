@@ -26,3 +26,9 @@ jobs:
           REF: ${{ vars.SUPABASE_PROJECT_REF }}
         run: |
           curl -sS "https://api.supabase.com/v1/projects/$REF/secrets" -H "Authorization: Bearer $TOKEN" | jq -r '.[].name'
+      - name: Проверочный вызов cron
+        env:
+          REF: ${{ vars.SUPABASE_PROJECT_REF }}
+          SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -sS -X POST "https://$REF.supabase.co/functions/v1/cron" -H "x-cron-secret: $SECRET" -H 'Content-Type: application/json' -d '{}' -w '\nHTTP %{http_code}\n'

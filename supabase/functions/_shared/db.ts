@@ -1,7 +1,19 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-// Клиент с service role: RLS закрывает таблицы от браузера, функции работают в обход.
-export const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
+// Серверный ключ: в новых проектах Supabase это sb_secret_… из SUPABASE_SECRET_KEYS,
+// в старых — SUPABASE_SERVICE_ROLE_KEY. RLS закрывает таблицы от браузера, функции работают в обход.
+function serverKey(): string {
+  const raw = Deno.env.get('SUPABASE_SECRET_KEYS');
+  if (raw) {
+    try {
+      const v = JSON.parse(raw);
+      const k = typeof v === 'string' ? v : Array.isArray(v) ? v[0] : (v.default ?? Object.values(v)[0]);
+      if (typeof k === 'string' && k) return k;
+    } catch { if (raw.startsWith('sb_secret_')) return raw; }
+  }
+  return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+}
+export const db = createClient(Deno.env.get('SUPABASE_URL')!, serverKey(), {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 

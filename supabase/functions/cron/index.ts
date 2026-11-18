@@ -118,6 +118,6 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify(await run()), { headers: { 'Content-Type': 'application/json' } });
   } catch (e) {
     console.error('cron error', e);
-    return new Response('error', { status: 500 });
+    return new Response(JSON.stringify({ error: String((e as Error)?.message ?? JSON.stringify(e)) }), { status: 500 });
   }
 });

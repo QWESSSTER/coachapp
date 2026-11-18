@@ -887,6 +887,7 @@ Deno.serve(async (req) => {
   } catch (e) {
     if (e instanceof Fail) return json({ error: e.message }, 400);
     console.error(body.action, e);
-    return json({ error: 'Что-то пошло не так. Попробуйте ещё раз.' }, 500);
+    const detail = String((e as Error)?.message ?? (e as Row)?.message ?? JSON.stringify(e)).slice(0, 300);
+    return json({ error: `Что-то пошло не так (${detail}). Попробуйте ещё раз.` }, 500);
   }
 });

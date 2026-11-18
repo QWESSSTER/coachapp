@@ -21,19 +21,19 @@ jobs:
       - name: Привязка проекта
         run: supabase link --project-ref "$REF" -p "${{ secrets.SUPABASE_DB_PASSWORD }}"
       - name: Миграции базы
-        run: supabase db push --remote -p "${{ secrets.SUPABASE_DB_PASSWORD }}"
+        run: supabase db push --remote --yes -p "${{ secrets.SUPABASE_DB_PASSWORD }}"
       - name: Секреты функций
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           REPO="${{ github.event.repository.name }}"
-          supabase secrets set --project-ref "$REF" \
+          supabase secrets set --project-ref "$REF" --yes \
             TELEGRAM_BOT_TOKEN="${{ secrets.TELEGRAM_BOT_TOKEN }}" \
             CRON_SECRET="${{ secrets.CRON_SECRET }}" \
             WEBHOOK_SECRET="${{ secrets.WEBHOOK_SECRET }}" \
             BOT_USERNAME="${{ vars.BOT_USERNAME }}" \
             WEBAPP_URL="https://$OWNER.github.io/$REPO/"
       - name: Функции api, bot, cron
-        run: supabase functions deploy --project-ref "$REF"
+        run: supabase functions deploy --project-ref "$REF" --yes
       - name: Вебхук и кнопка меню бота
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')

@@ -24,4 +24,5 @@ jobs:
         env:
           TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           REF: ${{ vars.SUPABASE_PROJECT_REF }}
-        run: curl -sS "https://api.supabase.com/v1/projects/$REF/secrets" -H "Authorization: Bearer $TOKEN" | jq -r '.[].name'
+        run: |
+          curl -sS "https://api.supabase.com/v1/projects/$REF/secrets" -H "Authorization: Bearer $TOKEN" | jq -r '.[].name'

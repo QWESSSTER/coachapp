@@ -19,6 +19,12 @@ jobs:
       - name: Адрес API из переменной SUPABASE_PROJECT_REF
         if: ${{ vars.SUPABASE_PROJECT_REF != '' }}
         run: echo "export const API_URL = 'https://${{ vars.SUPABASE_PROJECT_REF }}.supabase.co/functions/v1/api';" > webapp/config.js
+      - name: Версия в адресах файлов, чтобы Telegram не держал старую копию
+        run: |
+          V="${GITHUB_SHA::8}"
+          find webapp -name '*.js' -print0 | xargs -0 sed -i -E "s#(from '[^']+\.js)'#\1?v=$V'#g; s#(import\('[^']+\.js)'#\1?v=$V'#g"
+          sed -i -E "s#(src=\"js/app\.js)\"#\1?v=$V\"#; s#(href=\"styles\.css)\"#\1?v=$V\"#" webapp/index.html
+          grep -n "v=$V" webapp/index.html webapp/js/app.js | head
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with: { path: webapp }

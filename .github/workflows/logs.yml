@@ -1,0 +1,27 @@
+# Диагностика: последние логи функций Supabase (запуск вручную).
+name: Debug → Supabase logs
+on: workflow_dispatch
+jobs:
+  logs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Логи функций
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          REF: ${{ vars.SUPABASE_PROJECT_REF }}
+        run: |
+          START=$(date -u -d '-2 hours' +%Y-%m-%dT%H:%M:%SZ)
+          for SQL in \
+            "select timestamp, event_message, metadata from function_logs order by timestamp desc limit 40" \
+            "select timestamp, event_message, metadata from function_edge_logs order by timestamp desc limit 20"; do
+            echo "=== $SQL"
+            curl -sS -G "https://api.supabase.com/v1/projects/$REF/analytics/endpoints/logs.all" \
+              -H "Authorization: Bearer $TOKEN" \
+              --data-urlencode "sql=$SQL" --data-urlencode "iso_timestamp_start=$START" | head -c 30000
+            echo
+          done
+      - name: Какие ключи видят функции
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          REF: ${{ vars.SUPABASE_PROJECT_REF }}
+        run: curl -sS "https://api.supabase.com/v1/projects/$REF/secrets" -H "Authorization: Bearer $TOKEN" | jq -r '.[].name'

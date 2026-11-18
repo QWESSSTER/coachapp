@@ -21,7 +21,7 @@ jobs:
       - name: Привязка проекта
         run: supabase link --project-ref "$REF" -p "${{ secrets.SUPABASE_DB_PASSWORD }}"
       - name: Миграции базы
-        run: supabase db push -p "${{ secrets.SUPABASE_DB_PASSWORD }}"
+        run: supabase db push --remote -p "${{ secrets.SUPABASE_DB_PASSWORD }}"
       - name: Секреты функций
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
